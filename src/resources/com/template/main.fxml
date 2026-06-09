@@ -50,7 +50,7 @@
                   <Font name="Avenir Black" size="13.0" />
                </font>
             </Label>
-            <TableView fx:id="tblGatos" layoutX="36.0" layoutY="319.0" prefHeight="200.0" prefWidth="520.0">
+            <TableView fx:id="tblGatos" layoutX="36.0" layoutY="319.0" onMouseClicked="#carregarCampos" prefHeight="200.0" prefWidth="520.0">
               <columns>
                 <TableColumn fx:id="colID" prefWidth="77.0" style="-fx-background-color: #c3b49a;" text="ID" />
                 <TableColumn fx:id="colIdade" prefWidth="93.0" style="-fx-background-color: #c3b49a;" text="Idade" />

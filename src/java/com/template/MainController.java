@@ -8,6 +8,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.event.ActionEvent;
+import javafx.scene.input.MouseEvent;
+
 import java.util.ArrayList;
 
 public class MainController
@@ -36,14 +38,14 @@ public class MainController
         String pelagem = txtPelagem.getText();
         String sexo = txtSexo.getText();
 
-        GatosDTO objgatosdto = new GatosDTO(); //novo objeto de transferência de dados e preenche as propriedades dele
-        objgatosdto.setIdade(Integer.parseInt(idade));
-        objgatosdto.setRaca(raca);
-        objgatosdto.setPelagem(pelagem);
-        objgatosdto.setSexo(sexo);
+        GatosDTO objGatosDTO = new GatosDTO(); //novo objeto de transferência de dados e preenche as propriedades dele
+        objGatosDTO.setIdade(Integer.parseInt(idade));
+        objGatosDTO.setRaca(raca);
+        objGatosDTO.setPelagem(pelagem);
+        objGatosDTO.setSexo(sexo);
 
-        GatosDAO objgatosdao = new GatosDAO(); //classe de acesso ao banco de dados e envia o objeto criado para ser salvo
-        objgatosdao.cadastrarGatos(objgatosdto);
+        GatosDAO objgatosdao = new GatosDAO(); //envia o objeto criado para ser salvo
+        objgatosdao.cadastrarGatos(objGatosDTO);
 
         carregarGatos(); //chama o metodo para atualizar a tabela na tela
     }
@@ -58,8 +60,8 @@ public class MainController
             gatoSelecionado.setPelagem(txtPelagem.getText());
             gatoSelecionado.setSexo(txtSexo.getText());
 
-            GatosDAO objgatosdao = new GatosDAO(); //envia o objeto atualizado para o banco de dados realizar o UPDATE
-            objgatosdao.atualizarGatos(gatoSelecionado);
+            GatosDAO objGatosDAO = new GatosDAO(); //envia o objeto atualizado para o banco de dados realizar o UPDATE
+            objGatosDAO.atualizarGatos(gatoSelecionado);
 
             carregarGatos();
         }
@@ -70,8 +72,8 @@ public class MainController
         GatosDTO gatoSelecionado = tblGatos.getSelectionModel().getSelectedItem();
 
         if (gatoSelecionado != null) {
-            GatosDAO objgatosdao = new GatosDAO();
-            objgatosdao.deletarGatos(gatoSelecionado.getId()); //envia o ID do gato selecionado para o metodo de exclusão
+            GatosDAO objGatosDAO = new GatosDAO();
+            objGatosDAO.deletarGatos(gatoSelecionado.getId()); //envia o ID do gato selecionado para o metodo de exclusão
 
             carregarGatos();
         }
@@ -79,8 +81,8 @@ public class MainController
 
     @FXML
     private void carregarGatos() { //busca os dados do banco e mostra na tela
-        GatosDAO objgatosdao = new GatosDAO();
-        ArrayList<GatosDTO> listaGatos = objgatosdao.selecionarGatos();
+        GatosDAO objGatosDAO = new GatosDAO();
+        ArrayList<GatosDTO> listaGatos = objGatosDAO.selecionarGatos();
         tblGatos.setItems(FXCollections.observableArrayList(listaGatos)); //converte a lista comum em uma lista observável
     }
 
@@ -105,7 +107,7 @@ public class MainController
     }
 
     @FXML
-    private void carregarCampos(){  // joga os dados dele de volta para os campos de texto
+    private void carregarCampos(MouseEvent event){  // joga os dados dele de volta para os campos de texto
         GatosDTO gatosDTO = tblGatos.getSelectionModel().getSelectedItem();
 
         if(gatosDTO!=null){
