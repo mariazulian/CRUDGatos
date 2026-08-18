@@ -1,43 +1,25 @@
 package com.template.controller;
 
-import com.template.model.dao.GatosDAO;
 import com.template.model.dto.GatosDTO;
+import com.template.service.GatosService;
 import com.template.util.DialogUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.event.ActionEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
-
 public class MainController {
 
-    @FXML private Button btnSalvar;
-    @FXML private Button btnAlterar;
-    @FXML private Button btnExcluir;
-    @FXML private Button btnLimpar;
-
-    @FXML private TextField txtID;
-    @FXML private TextField txtIdade;
-    @FXML private TextField txtPelagem;
-    @FXML private TextField txtRaca;
-    @FXML private TextField txtSexo;
-
+    @FXML private Button btnSalvar, btnAlterar, btnExcluir, btnLimpar;
+    @FXML private TextField txtID, txtIdade, txtPelagem, txtRaca, txtSexo;
     @FXML private Label lblMensagem;
-
     @FXML private TableView<GatosDTO> tblGatos;
-    @FXML private TableColumn<GatosDTO, Integer> colID;
-    @FXML private TableColumn<GatosDTO, Integer> colIdade;
-    @FXML private TableColumn<GatosDTO, String> colRaca;
-    @FXML private TableColumn<GatosDTO, String> colPelagem;
-    @FXML private TableColumn<GatosDTO, String> colSexo;
+    @FXML private TableColumn<GatosDTO, Integer> colID, colIdade;
+    @FXML private TableColumn<GatosDTO, String> colRaca, colPelagem, colSexo;
+
+    private final GatosService gatoService = new GatosService();
 
     @FXML
     private void initialize() {
@@ -48,96 +30,68 @@ public class MainController {
         colSexo.setCellValueFactory(new PropertyValueFactory<>("sexo"));
 
         txtID.setEditable(false);
-        lblMensagem.setText("");
-
-        atualizarEstadoBotoes(false);
+        btnLimparAction();
         carregarGatos();
     }
 
     @FXML
-    private void btnSalvarAction(ActionEvent event) {
-        if (txtIdade.getText().trim().isEmpty() || txtRaca.getText().trim().isEmpty() ||
-                txtPelagem.getText().trim().isEmpty() || txtSexo.getText().trim().isEmpty()) {
-            exibirMensagemErro("Por favor, preencha todos os campos!");
-            return;
-        }
-
+    private void btnSalvarAction() {
         try {
-            int idade = Integer.parseInt(txtIdade.getText().trim());
-
-            GatosDTO objGatosDTO = new GatosDTO();
-            objGatosDTO.setIdade(idade);
-            objGatosDTO.setRaca(txtRaca.getText().trim());
-            objGatosDTO.setPelagem(txtPelagem.getText().trim());
-            objGatosDTO.setSexo(txtSexo.getText().trim());
-
-            GatosDAO objgatosdao = new GatosDAO();
-            objgatosdao.cadastrarGatos(objGatosDTO);
-
-            exibirMensagemSucesso("Gato cadastrado com sucesso!");
+            gatoService.salvarGato(txtIdade.getText(), txtRaca.getText(), txtPelagem.getText(), txtSexo.getText());
+            exibirMensagem("Gato cadastrado com sucesso!", Color.GREEN);
             carregarGatos();
-            btnLimparAction(null);
-        } catch (NumberFormatException e) {
-            exibirMensagemErro("A idade deve ser um número inteiro válido!");
+            btnLimparAction();
+        } catch (IllegalArgumentException e) {
+            exibirMensagem(e.getMessage(), Color.RED);
+        } catch (Exception e) {
+            e.printStackTrace(); // Imprime o erro no console do IntelliJ
+            exibirMensagem("Erro ao salvar no banco: " + e.getMessage(), Color.RED);
         }
     }
 
     @FXML
-    private void btnAlterarAction(ActionEvent event) {
-        GatosDTO gatoSelecionado = tblGatos.getSelectionModel().getSelectedItem();
-        if (gatoSelecionado == null) {
-            exibirMensagemErro("Selecione um gato na tabela para alterar!");
-            return;
-        }
-
-        if (txtIdade.getText().trim().isEmpty() || txtRaca.getText().trim().isEmpty() ||
-                txtPelagem.getText().trim().isEmpty() || txtSexo.getText().trim().isEmpty()) {
-            exibirMensagemErro("Preencha todos os campos para atualizar!");
-            return;
-        }
-
+    private void btnAlterarAction() {
         try {
-            int idade = Integer.parseInt(txtIdade.getText().trim());
-
-            gatoSelecionado.setIdade(idade);
-            gatoSelecionado.setRaca(txtRaca.getText().trim());
-            gatoSelecionado.setPelagem(txtPelagem.getText().trim());
-            gatoSelecionado.setSexo(txtSexo.getText().trim());
-
-            GatosDAO objGatosDAO = new GatosDAO();
-            objGatosDAO.atualizarGatos(gatoSelecionado);
-
-            exibirMensagemSucesso("Cadastro atualizado com sucesso!");
+            GatosDTO selecionado = tblGatos.getSelectionModel().getSelectedItem();
+            if (selecionado == null) {
+                exibirMensagem("Selecione um gato na tabela para alterar!", Color.RED);
+                return;
+            }
+            gatoService.atualizarGato(selecionado, txtIdade.getText(), txtRaca.getText(), txtPelagem.getText(), txtSexo.getText());
+            exibirMensagem("Cadastro atualizado com sucesso!", Color.GREEN);
             carregarGatos();
-            btnLimparAction(null);
-        } catch (NumberFormatException e) {
-            exibirMensagemErro("A idade deve ser um número inteiro válido!");
+            btnLimparAction();
+        } catch (IllegalArgumentException e) {
+            exibirMensagem(e.getMessage(), Color.RED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            exibirMensagem("Erro ao alterar no banco: " + e.getMessage(), Color.RED);
         }
     }
 
     @FXML
-    private void btnExcluirAction(ActionEvent event) {
-        GatosDTO gatoSelecionado = tblGatos.getSelectionModel().getSelectedItem();
-        if (gatoSelecionado == null) {
-            exibirMensagemErro("Selecione um gato na tabela para excluir!");
-            return;
-        }
+    private void btnExcluirAction() {
+        try {
+            GatosDTO selecionado = tblGatos.getSelectionModel().getSelectedItem();
+            if (selecionado == null) {
+                exibirMensagem("Selecione um gato na tabela para excluir!", Color.RED);
+                return;
+            }
 
-        // DIALOGUTIL  Ação critica exige confirmação do usuário!
-        boolean confirmou = DialogUtil.showConfirmation("Tem certeza de que deseja excluir o gato ID " + gatoSelecionado.getId() + "?");
-
-        if (confirmou) {
-            GatosDAO objGatosDAO = new GatosDAO();
-            objGatosDAO.deletarGatos(gatoSelecionado.getId());
-
-            exibirMensagemSucesso("Gato removido com sucesso!");
-            carregarGatos();
-            btnLimparAction(null);
+            if (DialogUtil.showConfirmation("Deseja excluir o gato ID " + selecionado.getId() + "?")) {
+                gatoService.excluirGato(selecionado);
+                exibirMensagem("Gato removido com sucesso!", Color.GREEN);
+                carregarGatos();
+                btnLimparAction();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            exibirMensagem("Erro ao excluir do banco: " + e.getMessage(), Color.RED);
         }
     }
 
     @FXML
-    private void btnLimparAction(ActionEvent event) {
+    private void btnLimparAction() {
         txtID.clear();
         txtIdade.clear();
         txtRaca.clear();
@@ -152,37 +106,35 @@ public class MainController {
 
     @FXML
     private void carregarCampos(MouseEvent event) {
-        GatosDTO gatosDTO = tblGatos.getSelectionModel().getSelectedItem();
-        if (gatosDTO != null) {
-            txtID.setText(String.valueOf(gatosDTO.getId()));
-            txtIdade.setText(String.valueOf(gatosDTO.getIdade()));
-            txtRaca.setText(gatosDTO.getRaca());
-            txtPelagem.setText(gatosDTO.getPelagem());
-            txtSexo.setText(gatosDTO.getSexo());
+        GatosDTO dto = tblGatos.getSelectionModel().getSelectedItem();
+        if (dto != null) {
+            txtID.setText(String.valueOf(dto.getId()));
+            txtIdade.setText(String.valueOf(dto.getIdade()));
+            txtRaca.setText(dto.getRaca());
+            txtPelagem.setText(dto.getPelagem());
+            txtSexo.setText(dto.getSexo());
             lblMensagem.setText("");
             atualizarEstadoBotoes(true);
         }
     }
 
     private void carregarGatos() {
-        GatosDAO objGatosDAO = new GatosDAO();
-        ArrayList<GatosDTO> listaGatos = objGatosDAO.selecionarGatos();
-        tblGatos.setItems(FXCollections.observableArrayList(listaGatos));
+        try {
+            tblGatos.setItems(FXCollections.observableArrayList(gatoService.listarGatos()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            exibirMensagem("Erro ao carregar os dados do banco.", Color.RED);
+        }
     }
 
-    private void atualizarEstadoBotoes(boolean itemSelecionado) {
-        btnAlterar.setDisable(!itemSelecionado);
-        btnExcluir.setDisable(!itemSelecionado);
-        btnSalvar.setDisable(itemSelecionado);
+    private void atualizarEstadoBotoes(boolean selecionado) {
+        btnAlterar.setDisable(!selecionado);
+        btnExcluir.setDisable(!selecionado);
+        btnSalvar.setDisable(selecionado);
     }
 
-    private void exibirMensagemErro(String mensagem) {
+    private void exibirMensagem(String mensagem, Color cor) {
         lblMensagem.setText(mensagem);
-        lblMensagem.setTextFill(Color.RED);
-    }
-
-    private void exibirMensagemSucesso(String mensagem) {
-        lblMensagem.setText(mensagem);
-        lblMensagem.setTextFill(Color.GREEN);
+        lblMensagem.setTextFill(cor);
     }
 }

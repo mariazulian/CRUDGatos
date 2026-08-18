@@ -15,7 +15,7 @@
    <children>
       <Pane layoutY="-5.0" prefHeight="557.0" prefWidth="600.0" style="-fx-background-color: #CBBD93;">
          <children>
-            <Button fx:id="btnSalvar" layoutX="450.0" layoutY="131.0" mnemonicParsing="false" onAction="#btnSalvarAction" prefHeight="28.0" prefWidth="66.0" style="-fx-background-color: white;" text="Salvar" textFill="#c3b49a">
+            <Button fx:id="btnSalvar" layoutX="450.0" layoutY="134.0" mnemonicParsing="false" onAction="#btnSalvarAction" prefHeight="28.0" prefWidth="66.0" style="-fx-background-color: white;" text="Salvar" textFill="#c3b49a">
                <font>
                   <Font name="Avenir Black" size="13.0" />
                </font>
@@ -79,17 +79,6 @@
                   <Font name="Avenir Black" size="13.0" />
                </font>
             </Button>
-            <ImageView fitHeight="102.0" fitWidth="151.0" layoutX="66.0" layoutY="11.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@imagens/istockphoto-2065445961-612x612.png" />
-               </image>
-            </ImageView>
-
-            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="363.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@imagens/gato-origem.png" />
-               </image>
-            </ImageView>
             <Label layoutX="195.0" layoutY="43.0" style="-fx-background-color: white;" text=" MVC Gatos " textFill="#c3b49a">
                <font>
                   <Font name="Avenir Black" size="36.0" />
@@ -101,6 +90,11 @@
                   <Font name="Avenir Black" size="13.0" />
                </font>
             </Label>
+            <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="398.0" layoutY="-6.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@imagens/fotosiames.png" />
+               </image>
+            </ImageView>
          </children>
       </Pane>
    </children>

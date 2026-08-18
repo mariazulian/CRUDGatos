@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Conexao {
-    static String conexao = "jdbc:postgresql://localhost:5432/Java 1 Bimestre";
+    static String conexao = "jdbc:postgresql://localhost:5432/MVCGatos";
     static String usuario = "postgres";
     static String senha = "postgres";
 
