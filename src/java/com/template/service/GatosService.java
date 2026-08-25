@@ -3,14 +3,17 @@ package com.template.service;
 import com.template.model.dao.GatosDAO;
 import com.template.model.dto.GatosDTO;
 import com.template.validator.GatosValidator;
+import com.template.util.DialogUtil;
 import java.util.List;
 
 public class GatosService {
 
     private final GatosDAO gatosDAO = new GatosDAO();
 
-    public void salvarGato(String idadeStr, String raca, String pelagem, String sexo) {
-        GatosValidator.validarCampos(idadeStr, raca, pelagem, sexo);
+    public boolean salvarGato(String idadeStr, String raca, String pelagem, String sexo) {
+        if (!GatosValidator.validarCampos(idadeStr, raca, pelagem, sexo)) {
+            return false;
+        }
 
         GatosDTO dto = new GatosDTO();
         dto.setIdade(Integer.parseInt(idadeStr.trim()));
@@ -19,15 +22,18 @@ public class GatosService {
         dto.setSexo(sexo.trim());
 
         gatosDAO.cadastrarGatos(dto);
+        return true;
     }
 
-    //implementação do atualizarGato
-    public void atualizarGato(GatosDTO selecionado, String idadeStr, String raca, String pelagem, String sexo) {
+    public boolean atualizarGato(GatosDTO selecionado, String idadeStr, String raca, String pelagem, String sexo) {
         if (selecionado == null) {
-            throw new IllegalArgumentException("Nenhum gato selecionado para atualização.");
+            DialogUtil.showError("Nenhum gato selecionado para atualização.");
+            return false;
         }
 
-        GatosValidator.validarCampos(idadeStr, raca, pelagem, sexo);
+        if (!GatosValidator.validarCampos(idadeStr, raca, pelagem, sexo)) {
+            return false;
+        }
 
         selecionado.setIdade(Integer.parseInt(idadeStr.trim()));
         selecionado.setRaca(raca.trim());
@@ -35,14 +41,14 @@ public class GatosService {
         selecionado.setSexo(sexo.trim());
 
         gatosDAO.atualizarGatos(selecionado);
+        return true;
     }
 
-    //implementação do excluirGato
     public void excluirGato(GatosDTO selecionado) {
         if (selecionado == null) {
-            throw new IllegalArgumentException("Nenhum gato selecionado para exclusão.");
+            DialogUtil.showError("Nenhum gato selecionado para exclusão.");
+            return;
         }
-
         gatosDAO.deletarGatos(selecionado.getId());
     }
 

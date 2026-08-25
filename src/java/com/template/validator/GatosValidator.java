@@ -1,42 +1,35 @@
 package com.template.validator;
 
+import com.template.util.DialogUtil;
+import java.util.ArrayList;
+import java.util.List;
+
 public class GatosValidator {
 
-    private static final String TEXTO_VALIDO_REGEX = "^[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\\s]+$";
+    public static boolean validarCampos(String idadeStr, String raca, String pelagem, String sexo) {
+        List<Validador<String>> validadores = new ArrayList<>();
 
-    public static void validarCampos(String idadeStr, String raca, String pelagem, String sexo) {
-        if (estaVazio(idadeStr) || estaVazio(raca) || estaVazio(pelagem) || estaVazio(sexo)) {
-            throw new IllegalArgumentException("Preencha todos os campos antes de prosseguir.");
-        }
+        // Adicionando os validadores de campos obrigatórios
+        validadores.add(new CampoObrigatorioValidador("Idade", idadeStr));
+        validadores.add(new CampoObrigatorioValidador("Raça", raca));
+        validadores.add(new CampoObrigatorioValidador("Pelagem", pelagem));
+        validadores.add(new CampoObrigatorioValidador("Sexo", sexo));
 
-        validarIdade(idadeStr);
-        validarTexto(raca, "raça");
-        validarTexto(pelagem, "pelagem");
-        validarTexto(sexo, "sexo");
-    }
+        // Adicionando validadores com regras específicas
+        validadores.add(new IdadeValidador(idadeStr));
+        validadores.add(new TextoValidador("Raça", raca));
+        validadores.add(new TextoValidador("Pelagem", pelagem));
+        validadores.add(new TextoValidador("Sexo", sexo));
 
-    public static void validarRaca(String raca) {
-        validarTexto(raca, "raça");
-    }
-
-    private static void validarTexto(String valor, String nomeCampo) {
-        if (!valor.trim().matches(TEXTO_VALIDO_REGEX)) {
-            throw new IllegalArgumentException("Digite uma " + nomeCampo + " válida (apenas letras).");
-        }
-    }
-
-    private static void validarIdade(String idadeStr) {
-        try {
-            int idade = Integer.parseInt(idadeStr.trim());
-            if (idade < 0 || idade > 30) {
-                throw new IllegalArgumentException("A idade do gato deve estar entre 0 e 30 anos.");
+        // Itera sobre a lista sequencialmente
+        for (Validador<String> validador : validadores) {
+            if (!validador.validar(validador.getValor())) {
+                // Exibe o Dialog e interrompe a validação (Slide 18)
+                DialogUtil.showWarning(validador.getMensagemErro());
+                return false;
             }
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("A idade deve ser um número inteiro válido.");
         }
-    }
 
-    private static boolean estaVazio(String campo) {
-        return campo == null || campo.trim().isEmpty();
+        return true;
     }
 }

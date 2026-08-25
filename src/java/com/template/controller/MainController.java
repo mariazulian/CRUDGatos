@@ -8,7 +8,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 
 public class MainController {
 
@@ -37,15 +36,15 @@ public class MainController {
     @FXML
     private void btnSalvarAction() {
         try {
-            gatoService.salvarGato(txtIdade.getText(), txtRaca.getText(), txtPelagem.getText(), txtSexo.getText());
-            exibirMensagem("Gato cadastrado com sucesso!", Color.GREEN);
-            carregarGatos();
-            btnLimparAction();
-        } catch (IllegalArgumentException e) {
-            exibirMensagem(e.getMessage(), Color.RED);
+            boolean sucesso = gatoService.salvarGato(txtIdade.getText(), txtRaca.getText(), txtPelagem.getText(), txtSexo.getText());
+            if (sucesso) {
+                DialogUtil.showInformation("Gato cadastrado com sucesso!");
+                carregarGatos();
+                btnLimparAction();
+            }
         } catch (Exception e) {
-            e.printStackTrace(); // Imprime o erro no console do IntelliJ
-            exibirMensagem("Erro ao salvar no banco: " + e.getMessage(), Color.RED);
+            e.printStackTrace();
+            DialogUtil.showError("Erro ao salvar no banco: " + e.getMessage());
         }
     }
 
@@ -54,18 +53,19 @@ public class MainController {
         try {
             GatosDTO selecionado = tblGatos.getSelectionModel().getSelectedItem();
             if (selecionado == null) {
-                exibirMensagem("Selecione um gato na tabela para alterar!", Color.RED);
+                DialogUtil.showWarning("Selecione um gato na tabela para alterar!");
                 return;
             }
-            gatoService.atualizarGato(selecionado, txtIdade.getText(), txtRaca.getText(), txtPelagem.getText(), txtSexo.getText());
-            exibirMensagem("Cadastro atualizado com sucesso!", Color.GREEN);
-            carregarGatos();
-            btnLimparAction();
-        } catch (IllegalArgumentException e) {
-            exibirMensagem(e.getMessage(), Color.RED);
+
+            boolean sucesso = gatoService.atualizarGato(selecionado, txtIdade.getText(), txtRaca.getText(), txtPelagem.getText(), txtSexo.getText());
+            if (sucesso) {
+                DialogUtil.showInformation("Cadastro atualizado com sucesso!");
+                carregarGatos();
+                btnLimparAction();
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            exibirMensagem("Erro ao alterar no banco: " + e.getMessage(), Color.RED);
+            DialogUtil.showError("Erro ao alterar no banco: " + e.getMessage());
         }
     }
 
@@ -74,19 +74,19 @@ public class MainController {
         try {
             GatosDTO selecionado = tblGatos.getSelectionModel().getSelectedItem();
             if (selecionado == null) {
-                exibirMensagem("Selecione um gato na tabela para excluir!", Color.RED);
+                DialogUtil.showWarning("Selecione um gato na tabela para excluir!");
                 return;
             }
 
             if (DialogUtil.showConfirmation("Deseja excluir o gato ID " + selecionado.getId() + "?")) {
                 gatoService.excluirGato(selecionado);
-                exibirMensagem("Gato removido com sucesso!", Color.GREEN);
+                DialogUtil.showInformation("Gato removido com sucesso!");
                 carregarGatos();
                 btnLimparAction();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            exibirMensagem("Erro ao excluir do banco: " + e.getMessage(), Color.RED);
+            DialogUtil.showError("Erro ao excluir do banco: " + e.getMessage());
         }
     }
 
@@ -123,7 +123,7 @@ public class MainController {
             tblGatos.setItems(FXCollections.observableArrayList(gatoService.listarGatos()));
         } catch (Exception e) {
             e.printStackTrace();
-            exibirMensagem("Erro ao carregar os dados do banco.", Color.RED);
+            DialogUtil.showError("Erro ao carregar os dados do banco.");
         }
     }
 
@@ -131,10 +131,5 @@ public class MainController {
         btnAlterar.setDisable(!selecionado);
         btnExcluir.setDisable(!selecionado);
         btnSalvar.setDisable(selecionado);
-    }
-
-    private void exibirMensagem(String mensagem, Color cor) {
-        lblMensagem.setText(mensagem);
-        lblMensagem.setTextFill(cor);
     }
 }

@@ -1,11 +1,13 @@
 package com.template.validator;
 
-public class RacaValidador implements Validador<String> {
+public class TextoValidador implements Validador<String> {
 
     private static final String REGEX_LETRAS = "^[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\\s]+$";
+    private final String nomeCampo;
     private final String valor;
 
-    public RacaValidador(String valor) {
+    public TextoValidador(String nomeCampo, String valor) {
+        this.nomeCampo = nomeCampo;
         this.valor = valor;
     }
 
@@ -19,10 +21,7 @@ public class RacaValidador implements Validador<String> {
 
     @Override
     public String getMensagemErro() {
-        if (this.valor == null || this.valor.trim().isEmpty()) {
-            return "O campo Raça deve ser preenchido.";
-        }
-        return "Digite uma Raça válida (apenas letras).";
+        return "Digite um(a) " + nomeCampo.toLowerCase() + " válido(a) (apenas letras).";
     }
 
     @Override
