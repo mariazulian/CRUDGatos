@@ -2,7 +2,6 @@ package com.template.validator;
 
 public class TextoValidador implements Validador<String> {
 
-    private static final String REGEX_LETRAS = "^[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\\s]+$";
     private final String nomeCampo;
     private final String valor;
 
@@ -14,14 +13,14 @@ public class TextoValidador implements Validador<String> {
     @Override
     public boolean validar(String valorAtual) {
         if (this.valor == null || this.valor.trim().isEmpty()) {
-            return false;
+            return true; // A obrigatoriedade é validada por CampoObrigatorioValidador
         }
-        return this.valor.trim().matches(REGEX_LETRAS);
+        return this.valor.trim().matches("^[a-zA-ZÀ-ÿ\\s]{2,}$");
     }
 
     @Override
     public String getMensagemErro() {
-        return "Digite um(a) " + nomeCampo.toLowerCase() + " válido(a) (apenas letras).";
+        return "O campo " + nomeCampo + " deve conter apenas letras e ter no mínimo 2 caracteres.";
     }
 
     @Override

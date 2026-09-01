@@ -2,6 +2,7 @@ package com.template.controller;
 
 import com.template.model.dto.GatosDTO;
 import com.template.service.GatosService;
+import com.template.service.IGatosService;
 import com.template.util.DialogUtil;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -18,7 +19,18 @@ public class MainController {
     @FXML private TableColumn<GatosDTO, Integer> colID, colIdade;
     @FXML private TableColumn<GatosDTO, String> colRaca, colPelagem, colSexo;
 
-    private final GatosService gatoService = new GatosService();
+    // Dependência apontando para a ABSTRAÇÃO (Interface), não para a classe concreta (DIP)
+    private final IGatosService gatoService;
+
+    // Construtor padrão necessário para o FXMLLoader do JavaFX
+    public MainController() {
+        this(new GatosService());
+    }
+
+    // Construtor com Injeção de Dependência para testes e desacoplamento
+    public MainController(IGatosService gatoService) {
+        this.gatoService = gatoService;
+    }
 
     @FXML
     private void initialize() {

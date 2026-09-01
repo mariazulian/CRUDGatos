@@ -3,15 +3,28 @@ package com.template.service;
 import com.template.model.dao.GatosDAO;
 import com.template.model.dto.GatosDTO;
 import com.template.validator.GatosValidator;
+import com.template.validator.IGatosValidator;
 import com.template.util.DialogUtil;
 import java.util.List;
 
-public class GatosService {
+public class GatosService implements IGatosService {
 
     private final GatosDAO gatosDAO = new GatosDAO();
+    private final IGatosValidator gatosValidator;
 
+    // Construtor padrão
+    public GatosService() {
+        this(new GatosValidator());
+    }
+
+    // Construtor com injeção de dependência do validador (DIP)
+    public GatosService(IGatosValidator gatosValidator) {
+        this.gatosValidator = gatosValidator;
+    }
+
+    @Override
     public boolean salvarGato(String idadeStr, String raca, String pelagem, String sexo) {
-        if (!GatosValidator.validarCampos(idadeStr, raca, pelagem, sexo)) {
+        if (!gatosValidator.validarCampos(idadeStr, raca, pelagem, sexo)) {
             return false;
         }
 
@@ -25,13 +38,14 @@ public class GatosService {
         return true;
     }
 
+    @Override
     public boolean atualizarGato(GatosDTO selecionado, String idadeStr, String raca, String pelagem, String sexo) {
         if (selecionado == null) {
             DialogUtil.showError("Nenhum gato selecionado para atualização.");
             return false;
         }
 
-        if (!GatosValidator.validarCampos(idadeStr, raca, pelagem, sexo)) {
+        if (!gatosValidator.validarCampos(idadeStr, raca, pelagem, sexo)) {
             return false;
         }
 
@@ -44,6 +58,7 @@ public class GatosService {
         return true;
     }
 
+    @Override
     public void excluirGato(GatosDTO selecionado) {
         if (selecionado == null) {
             DialogUtil.showError("Nenhum gato selecionado para exclusão.");
@@ -52,6 +67,7 @@ public class GatosService {
         gatosDAO.deletarGatos(selecionado.getId());
     }
 
+    @Override
     public List<GatosDTO> listarGatos() {
         return gatosDAO.selecionarGatos();
     }
